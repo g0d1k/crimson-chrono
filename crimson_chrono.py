@@ -439,15 +439,16 @@ class CrimsonChrono(ctk.CTk):
 
         if self.analog_mode:
             self.canvas = tk.Canvas(card, width=420, height=420, bg=card_bg, highlightthickness=0)
-            self.canvas.pack(pady=30)
+            self.canvas.pack(pady=(20, 8))
             self.draw_analog()
         else:
             self.time_label = ctk.CTkLabel(card, text="00:00:00",
                                            font=ctk.CTkFont(family="Consolas", size=92, weight="bold"),
                                            text_color=ACCENT)
             self.time_label.pack(pady=(60, 10))
-            self.date_label = ctk.CTkLabel(card, text="", font=ctk.CTkFont(size=24), text_color=text_c)
-            self.date_label.pack()
+        self.date_label = ctk.CTkLabel(card, text=datetime.now().strftime("%A, %B %d, %Y"),
+                                       font=ctk.CTkFont(size=24), text_color=text_c)
+        self.date_label.pack()
 
         self.tz_label = ctk.CTkLabel(card, text="Local Time", font=ctk.CTkFont(size=16), text_color=text_c)
         self.tz_label.pack(pady=10)
@@ -945,7 +946,7 @@ class CrimsonChrono(ctk.CTk):
             else:
                 fmt = "%I:%M:%S %p" if self.use_12h else "%H:%M:%S"
                 self.time_label.configure(text=now.strftime(fmt))
-                self.date_label.configure(text=now.strftime("%A, %B %d, %Y"))
+            self.date_label.configure(text=now.strftime("%A, %B %d, %Y"))
 
         # World clocks
         if self.current_view == "world":
