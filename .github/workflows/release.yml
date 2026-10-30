@@ -1,0 +1,49 @@
+name: Release AppImage
+
+# Push a tag like v1.0.0 to build the AppImage and publish it as a GitHub Release.
+# Built on Ubuntu 22.04 (glibc 2.35) so it runs on most current Linux distros.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  appimage:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system packages
+        run: sudo apt-get update && sudo apt-get install -y libtk8.6 xvfb
+
+      - name: Build AppImage
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then VERSION="${GITHUB_REF_NAME#v}"; else VERSION="dev"; fi
+          VERSION="$VERSION" PYTHON=python ./build_appimage.sh
+
+      - name: Smoke test (app must still be running after 10s)
+        run: |
+          set +e
+          APPIMAGE_EXTRACT_AND_RUN=1 xvfb-run -a timeout 10 ./dist/*.AppImage
+          code=$?
+          [ "$code" -eq 124 ] || { echo "AppImage exited early with code $code"; exit 1; }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: appimage
+          path: dist/*.AppImage
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.AppImage \
+            --title "Crimson Chrono $GITHUB_REF_NAME" --generate-notes

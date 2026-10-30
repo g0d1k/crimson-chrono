@@ -1,0 +1,3 @@
+customtkinter>=5.2.0
+# Optional for better Linux sound: sudo apt install paplay (pulseaudio-utils) or beep
+# zoneinfo is stdlib (Python 3.9+). On some systems: pip install tzdata
