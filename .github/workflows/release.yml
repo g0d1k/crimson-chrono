@@ -26,7 +26,8 @@ jobs:
       - name: Build AppImage
         run: |
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then VERSION="${GITHUB_REF_NAME#v}"; else VERSION="dev"; fi
-          VERSION="$VERSION" PYTHON=python ./build_appimage.sh
+          # xvfb: the icon resize step uses Tk, which needs a display
+          VERSION="$VERSION" PYTHON=python xvfb-run -a ./build_appimage.sh
 
       - name: Smoke test (app must still be running after 10s)
         run: |
