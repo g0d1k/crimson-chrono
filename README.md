@@ -24,6 +24,17 @@ chmod +x Crimson_Chrono-*-x86_64.AppImage
 If it complains about FUSE, install `libfuse2` (`sudo apt install libfuse2t64` on newer Ubuntu)
 or run it with `--appimage-extract-and-run`.
 
+## Download (Windows)
+
+Grab `CrimsonChrono.exe` from the [Releases page](https://github.com/g0d1k/crimson-chrono/releases)
+and double-click it. There's nothing to install and Python isn't required. It may take a few seconds
+to start, because it unpacks itself each time it launches.
+
+The `.exe` isn't code-signed, so Windows may show "Windows protected your PC" the first time you run it.
+To continue, click **More info**, then **Run anyway**.
+
+Settings, alarms and world clocks are saved to `%USERPROFILE%\.crimson_chrono.json`.
+
 ## Install & Run from source
 
 ```bash
@@ -50,3 +61,15 @@ appimagetool. An AppImage only runs on distros with a glibc at least as new as t
 so official releases are built by GitHub Actions on Ubuntu 22.04: push a tag like `v1.0.1` and the
 `Release AppImage` workflow builds, smoke-tests, and publishes it to Releases.
 
+## Building the Windows .exe
+
+PyInstaller only builds for the system it runs on, so run this on Windows, from the project folder:
+
+```bash
+pip install pyinstaller customtkinter tzdata pillow
+pyinstaller --noconfirm --onefile --windowed --name CrimsonChrono --icon icon.png --add-data "icon.png:." --collect-all customtkinter --collect-data tzdata crimson_chrono.py
+```
+
+The output is `dist\CrimsonChrono.exe`. Don't leave out `--collect-data tzdata`: Windows has no built-in
+timezone database, so World Clocks need the bundled copy. The `.exe` isn't built by GitHub Actions, so
+upload it to the release by hand.
